@@ -1,7 +1,10 @@
 # Voting Application
 
 A simple polling application where users can create polls, vote, and view results with support for anonymous poll creation and voting.
-> this project was made as a technical assessment
+
+A Monorepo that is easily deployable using docker compose
+
+>**Disclaimer** : this project was made as a technical assessment
 
 ## Tech Stack
 
