@@ -7,7 +7,36 @@ import { CreatePollForm } from "@/components/CreatePollForm";
 import { PollCard } from "@/components/PollCard";
 import { Header } from "@/components/Header";
 import { useAuth } from "@/components/AuthProvider";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import Link from "next/link";
+import { Vote, RefreshCw, AlertCircle, Inbox, Loader2 } from "lucide-react";
+
+function PollCardSkeleton() {
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <div className="space-y-3">
+          <Skeleton className="h-6 w-3/4" />
+          <Skeleton className="h-4 w-full" />
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-5 w-12" />
+            </div>
+            <Skeleton className="h-2 w-full" />
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function Home() {
   const [polls, setPolls] = useState<Poll[]>([]);
@@ -44,7 +73,7 @@ export default function Home() {
 
   async function handleDelete(id: number) {
     if (!confirm("Are you sure you want to delete this poll?")) return;
-    
+
     try {
       setError("");
       await deletePoll(id);
@@ -56,11 +85,20 @@ export default function Home() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-zinc-50">
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading...</p>
+      <div className="min-h-screen bg-background">
+        <div className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="container flex h-14 items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-5 w-5 rounded-full" />
+              <Skeleton className="h-5 w-24" />
+            </div>
+            <Skeleton className="h-8 w-20" />
+          </div>
+        </div>
+        <div className="flex items-center justify-center min-h-[calc(100vh-3.5rem)]">
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="h-10 w-10 animate-spin text-primary" />
+            <p className="text-muted-foreground">Loading...</p>
           </div>
         </div>
       </div>
@@ -69,54 +107,84 @@ export default function Home() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-zinc-50">
+      <div className="min-h-screen bg-background">
         <Header />
-        <main className="max-w-4xl mx-auto px-4 py-16 text-center">
-          <h1 className="text-4xl font-bold text-zinc-900 mb-4">
-            Welcome to Voting App
-          </h1>
-          <p className="text-xl text-zinc-600 mb-8">
-            Create polls and cast your votes. Sign in to get started!
-          </p>
-          <Link
-            href="/login"
-            className="inline-block px-8 py-3 text-lg font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
-          >
-            Sign in
-          </Link>
+        <main className="container py-16 md:py-24">
+          <div className="flex flex-col items-center text-center space-y-8">
+            <div className="flex items-center justify-center h-20 w-20 rounded-full bg-primary/10 mb-4">
+              <Vote className="h-10 w-10 text-primary" />
+            </div>
+            <div className="space-y-4 max-w-md">
+              <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+                Welcome to Voting App
+              </h1>
+              <p className="text-xl text-muted-foreground">
+                Create polls and cast your votes. Sign in to get testing my assessment!
+              </p>
+            </div>
+            <Button asChild size="lg" className="mt-4">
+              <Link href="/login">
+                Sign in
+              </Link>
+            </Button>
+          </div>
         </main>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black">
+    <div className="min-h-screen bg-background">
       <Header />
 
-      <main className="max-w-4xl mx-auto px-4 py-8 space-y-8">
+      <main className="container py-8 space-y-8">
         {error && (
-          <div className="p-4 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg">
-            {error}
-          </div>
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
         )}
 
         <CreatePollForm onPollCreated={loadPolls} />
 
-        <div>
-          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-4">
-            Active Polls
-          </h2>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <h2 className="text-2xl font-semibold tracking-tight">Active Polls</h2>
+              {!loading && (
+                <span className="text-sm text-muted-foreground bg-muted px-2.5 py-0.5 rounded-full">
+                  {polls.length}
+                </span>
+              )}
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={loadPolls}
+              disabled={loading}
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+              Refresh
+            </Button>
+          </div>
 
           {loading ? (
-            <div className="text-center py-12 text-zinc-500 dark:text-zinc-400">
-              Loading polls...
+            <div className="grid gap-6">
+              {[1, 2].map((i) => (
+                <PollCardSkeleton key={i} />
+              ))}
             </div>
           ) : polls.length === 0 ? (
-            <div className="text-center py-12 text-zinc-500 dark:text-zinc-400">
-              No polls yet. Create one above!
+            <div className="flex flex-col items-center justify-center py-16 text-center border-2 border-dashed rounded-lg">
+              <Inbox className="h-12 w-12 text-muted-foreground/50 mb-4" />
+              <p className="text-muted-foreground text-lg mb-1">No polls yet</p>
+              <p className="text-muted-foreground text-sm">
+                Create your first poll using the form above!
+              </p>
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="grid gap-6">
               {polls.map((poll) => (
                 <PollCard
                   key={poll.id}

@@ -1,5 +1,16 @@
 "use client";
 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { User, Users, EyeOff } from "lucide-react";
+
 interface VotersModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -9,58 +20,58 @@ interface VotersModalProps {
 }
 
 export function VotersModal({ isOpen, onClose, choiceName, voters, totalVotes }: VotersModalProps) {
-  if (!isOpen) return null;
-
   const anonymousCount = totalVotes - voters.length;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-lg border border-zinc-200 dark:border-zinc-800 p-6 max-w-md w-full mx-4">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-            Voters for "{choiceName}"
-          </h3>
-          <button
-            onClick={onClose}
-            className="text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <User className="h-5 w-5" />
+            Voters for "{choiceName}"";
+          </DialogTitle>
+          <DialogDescription className="flex items-center gap-2">
+            <Badge variant="secondary">{totalVotes} total</Badge>
+            <Badge variant="outline">{voters.length} public</Badge>
+            <Badge variant="outline">{anonymousCount} anonymous</Badge>
+          </DialogDescription>
+        </DialogHeader>
 
-        <div className="mb-4">
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            Total votes: {totalVotes} ({voters.length} public, {anonymousCount} anonymous)
-          </p>
-        </div>
-
-        <div className="max-h-64 overflow-y-auto">
+        <div className="max-h-64 overflow-y-auto space-y-2">
           {voters.length > 0 ? (
-            <ul className="space-y-2">
-              {voters.map((voter, index) => (
-                <li
-                  key={index}
-                  className="p-2 bg-zinc-50 dark:bg-zinc-800 rounded-md text-zinc-800 dark:text-zinc-200"
-                >
-                  {voter}
-                </li>
-              ))}
-            </ul>
+            voters.map((voter, index) => (
+              <div
+                key={index}
+                className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg"
+              >
+                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                  <User className="h-4 w-4 text-primary" />
+                </div>
+                <span className="font-medium">{voter}</span>
+              </div>
+            ))
           ) : (
-            <p className="text-center text-zinc-500 dark:text-zinc-400 py-4">
-              No public voters for this choice
-            </p>
+            <div className="flex flex-col items-center justify-center py-8 text-center">
+              <EyeOff className="h-10 w-10 text-muted-foreground/50 mb-2" />
+              <p className="text-muted-foreground">
+                No public voters for this choice
+              </p>
+            </div>
           )}
         </div>
 
         {anonymousCount > 0 && (
-          <div className="mt-4 pt-3 border-t border-zinc-200 dark:border-zinc-800 text-sm text-zinc-500 dark:text-zinc-400 text-center">
-            +{anonymousCount} anonymous voter{anonymousCount === 1 ? "" : "s"}
-          </div>
+          <>
+            <Separator />
+            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground py-2">
+              <Users className="h-4 w-4" />
+              <span>
+                +{anonymousCount} anonymous voter{anonymousCount === 1 ? "" : "s"}
+              </span>
+            </div>
+          </>
         )}
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
