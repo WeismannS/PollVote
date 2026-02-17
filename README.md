@@ -18,13 +18,13 @@ A simple polling application where users can create polls, vote, and view result
 - **Language**: TypeScript
 - **Database**: PostgreSQL
 - **ORM**: Drizzle ORM
-- **Authentication**: Better-Auth with session-based auth
+- **Authentication**: Better-Auth
 - **Runtime**: Bun
 
 ### Infrastructure
 
 - **Containerization**: Docker & Docker Compose
-- **Database**: PostgreSQL 17
+- **Database**: PostgreSQL
 
 ## Quick Start
 
